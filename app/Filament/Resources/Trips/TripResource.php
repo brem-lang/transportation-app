@@ -15,12 +15,26 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class TripResource extends Resource
 {
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $model = Trip::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::AdjustmentsVertical;
+
+    public static function canAccess(): bool
+    {
+        return Auth::user()->isAdmin();
+    }
+
+    public static function getEloquentQueryBuilder(): Builder
+    {
+        return parent::getEloquentQuery()->with(['driver.user', 'vehicle', 'company']);
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -42,6 +56,11 @@ class TripResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('status', 'in_progress')->count();
     }
 
     public static function getPages(): array

@@ -14,8 +14,10 @@ class EditTrip extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            ViewAction::make()
+                ->icon('heroicon-o-eye'),
+            DeleteAction::make()
+                ->icon('heroicon-o-trash'),
         ];
     }
 }

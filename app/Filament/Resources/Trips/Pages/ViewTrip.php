@@ -13,7 +13,8 @@ class ViewTrip extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            EditAction::make()
+                ->icon('heroicon-o-pencil'),
         ];
     }
 }

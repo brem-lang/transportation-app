@@ -19,7 +19,7 @@ class CompanyForm
                             ->required(),
                         TextInput::make('address'),
                         TextInput::make('phone')
-                            ->tel(),
+                            ->required(),
                         Toggle::make('is_active')
                             ->required(),
                     ]),

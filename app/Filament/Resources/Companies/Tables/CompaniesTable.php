@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -17,12 +18,14 @@ class CompaniesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->weight(FontWeight::Bold)
                     ->searchable(),
                 TextColumn::make('address')
                     ->searchable(),
                 TextColumn::make('phone')
                     ->searchable(),
                 IconColumn::make('is_active')
+                    ->label('Status')
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -44,6 +47,9 @@ class CompaniesTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->modifyQueryUsing(function ($query) {
+                return $query->orderBy('created_at', 'desc');
+            });
     }
 }

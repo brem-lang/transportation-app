@@ -13,6 +13,10 @@ class Trip extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'start_location' => 'array',
+    ];
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);

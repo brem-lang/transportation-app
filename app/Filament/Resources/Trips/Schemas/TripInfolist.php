@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Trips\Schemas;
 
+use App\Filament\Infolists\Components\LocationEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -21,24 +22,23 @@ class TripInfolist
                                     'scheduled' => 'warning',
                                     'in_progress' => 'info',
                                     'completed' => 'success',
+                                    'cancelled' => 'danger',
                                 }
                             )
                             ->formatStateUsing(fn (string $state) => ucfirst($state)),
-                        TextEntry::make('start_location'),
                         TextEntry::make('scheduled_start_time')
-                            ->dateTime(),
+                            ->dateTime('F j, Y, g:i A'),
+                        TextEntry::make('scheduled_end_time')
+                            ->dateTime('F j, Y, g:i A'),
                         TextEntry::make('company.name')
                             ->label('Company'),
-                        TextEntry::make('driver.id')
+                        TextEntry::make('driver.user.name')
                             ->label('Driver'),
-                        TextEntry::make('vehicle.id')
+                        TextEntry::make('vehicle.make')
                             ->label('Vehicle'),
-                        TextEntry::make('created_at')
-                            ->dateTime()
-                            ->placeholder('-'),
-                        TextEntry::make('updated_at')
-                            ->dateTime()
-                            ->placeholder('-'),
+                        LocationEntry::make('start_location')
+                            ->label('Location')
+                            ->columnSpanFull(),
                     ]),
             ]);
     }

@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(CompanySeeder::class);
-        $this->call(DriverSeeder::class);
-        $this->call(VehicleSeeder::class);
-        $this->call(TripSeeder::class);
+        // $this->call(DriverSeeder::class);
+        // $this->call(VehicleSeeder::class);
+        // $this->call(TripSeeder::class);
     }
 }
