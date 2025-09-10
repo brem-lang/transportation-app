@@ -1,63 +1,77 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Project Setup Instructions
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Follow these steps in your terminal to get the application running.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 1. Install Dependencies
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This command installs all the required PHP packages defined in your `composer.json` file.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+composer install
+```
 
-## Learning Laravel
+### 2. Set Up the Database
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+This command will drop all existing tables, re-run all migrations to create a fresh database schema, and then run the seeders to populate the database with initial data.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+php artisan migrate:fresh --seed
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Start the Development Server
 
-## Laravel Sponsors
+This command starts the local PHP development server, typically making the application available at `http://127.0.0.1:8000`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+php artisan serve
+```
 
-### Premium Partners
+### 4. Run the Queue Worker
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+This is essential for processing background jobs, such as sending real-time notifications for new trips. This command must be kept running in a separate terminal window.
 
-## Contributing
+```bash
+php artisan queue:listen
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Key Design Decisions
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 1. Overlapping Trip Validation
 
-## Security Vulnerabilities
+To prevent double-booking of drivers and vehicles, a dedicated custom validation rule (App\Rules\DoesNotOverlap) was implemented.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+##### Key Rationale:
 
-## License
+-   Reusable & Consistent: This approach ensures the same validation logic is applied everywhere a trip can be scheduled.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# transportation-app
-# transportation-app
+-   Separation of Concerns: It keeps critical business logic separate from the user interface code, making the application easier to maintain.
+
+-   Real-time Feedback: It integrates with Filament's forms to provide immediate validation to the user, improving their experience.
+
+The rule works by checking for any active trips (scheduled or in_progress) that have a time conflict with a new or updated trip.
+
+### 2. Query Performance Optimization
+
+To ensure the application remains fast as data grows, two main strategies were used:
+
+-   ager Loading: The "N+1 query problem" was solved by using Laravel Eloquent's with() method in all resources and pages. This loads all necessary related data (like driver and vehicle names) in a minimal number of queries, making tables and lists load much faster.
+
+-   Efficient Date Filtering: For dashboard KPIs, slow date functions like whereMonth() were replaced with the much faster whereBetween() clause. This allows the database to use indexes to find records almost instantly, avoiding slow table scans.
+
+## Key Assumptions
+
+Several assumptions were made to meet the project requirements, particularly where the acceptance criteria were high-level.
+
+* User Roles & Authentication: It was assumed that a standard Laravel authentication system was in place, with distinct "Admin" and "Driver" roles. This was crucial for implementing the different permissions and dashboard views required by the challenge.
+
+* Location Picker Implementation: The challenge implies selecting locations for trips, which requires a map interface.
+
+  + Custom Component: It was assumed that a custom form field component would be necessary. The implementation involved integrating a third-party JavaScript library (Leaflet.js) into a reusable Filament component.
+
+  + Data Structure: Location data (start_location and end_location) was assumed to be stored as a JSON column in the trips table. This is a flexible approach that allows for storing a structured object containing the human-readable address as well as the precise latitude and longitude.
+
+  + Geocoding Service: It was assumed that an external geocoding service (like Nominatim for OpenStreetMap) would be used to convert addresses into coordinates for routing and map display. 
