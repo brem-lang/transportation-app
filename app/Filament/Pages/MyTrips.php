@@ -43,10 +43,10 @@ class MyTrips extends Page implements HasSchemas, HasTable
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('cancel')
+            Action::make('back')
                 ->visible(fn () => $this->activePage === 'view')
                 ->icon('heroicon-o-x-circle')
-                ->label('Cancel')
+                ->label('Back')
                 ->action(function () {
                     $this->selectedTrip;
                     $this->activePage = 'list';
