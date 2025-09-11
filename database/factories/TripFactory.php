@@ -18,8 +18,12 @@ class TripFactory extends Factory
     {
         return [
             'status' => fake()->randomElement(['scheduled', 'in_progress', 'completed']),
-            'start_location' => fake()->randomElement(['home', 'work']),
+            'start_location' => [
+                'lat' => fake()->randomFloat(10, 100),
+                'lng' => fake()->randomFloat(10, 100),
+            ],
             'scheduled_start_time' => fake()->dateTimeBetween('-30 days', 'now'),
+            'scheduled_end_time' => now()->addDays(2),
             'company_id' => \App\Models\Company::factory(),
             'driver_id' => \App\Models\Driver::factory(),
             'vehicle_id' => \App\Models\Vehicle::factory(),

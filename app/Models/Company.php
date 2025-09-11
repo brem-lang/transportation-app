@@ -13,6 +13,10 @@ class Company extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     public function drivers(): HasMany
     {
         return $this->hasMany(Driver::class);
