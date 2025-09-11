@@ -36,6 +36,14 @@ This is essential for processing background jobs, such as sending real-time noti
 php artisan queue:listen
 ```
 
+### 5. Run Pest Tests
+
+This command runs all tests in the `tests` directory.
+
+```bash
+php artisan test
+```
+
 ---
 
 ## Key Design Decisions
